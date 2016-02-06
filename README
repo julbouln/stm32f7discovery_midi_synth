@@ -8,6 +8,8 @@ SF2 soundfont must be copied on SD card, filename can be configured in main.h
 Usage:
 make cube # once
 make build_openocd # once
+git submodule init # once
+git submodule update # once
 make
 make program
 
