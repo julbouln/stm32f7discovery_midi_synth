@@ -65,6 +65,10 @@ void OTG_HS_IRQHandler(void);
 #endif
 void DMA2_Stream4_IRQHandler(void);
 
+void DMA2_Stream3_IRQHandler(void);
+void DMA2_Stream6_IRQHandler(void);
+void SDMMC1_IRQHandler(void);
+
 #ifdef __cplusplus
 }
 #endif

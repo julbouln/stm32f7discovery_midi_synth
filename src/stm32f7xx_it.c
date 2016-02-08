@@ -180,6 +180,27 @@ void OTG_HS_IRQHandler(void)
   HAL_PCD_IRQHandler(&hpcd);
 }
 
+
+/**
+  * @brief  This function handles DMA2 Stream 3 interrupt request.
+  * @param  None
+  * @retval None
+  */
+void DMA2_Stream3_IRQHandler(void)
+{
+  BSP_SD_DMA_Rx_IRQHandler();
+}
+
+/**
+  * @brief  This function handles DMA2 Stream 6 interrupt request.
+  * @param  None
+  * @retval None
+  */
+void DMA2_Stream6_IRQHandler(void)
+{
+  BSP_SD_DMA_Tx_IRQHandler(); 
+}
+
 /**
   * @brief  This function handles SDIO interrupt request.
   * @param  None
@@ -199,6 +220,8 @@ void DMA2_Stream4_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(haudio_out_sai.hdmatx);
 }
+
+
 /******************************************************************************/
 /*                 STM32F7xx Peripherals Interrupt Handlers                   */
 /*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */

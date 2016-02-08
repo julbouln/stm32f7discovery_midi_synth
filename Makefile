@@ -126,7 +126,7 @@ LIBS       = -L$(CMSIS_DIR)/Lib
 
 # Compiler flags
 #CFLAGS     = -Wall -g -std=c99 -Os
-CFLAGS     = -Wall -std=c99 -Os
+CFLAGS     = -Wall -std=c99 -Os -g
 #CFLAGS	   = -Wall -std=c99 -O3
 
 CFLAGS += -mcpu=cortex-m7 -mlittle-endian

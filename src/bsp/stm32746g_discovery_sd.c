@@ -179,7 +179,15 @@ uint8_t BSP_SD_Init(void)
       sd_state = MSD_OK;
     }
   }
-  
+  /*
+  HAL_SD_HighSpeed(&uSdHandle);
+
+  RCC_PeriphCLKInitTypeDef RCC_ExCLKInitStruct;
+  HAL_RCCEx_GetPeriphCLKConfig(&RCC_ExCLKInitStruct);
+  RCC_ExCLKInitStruct.Clk48ClockSelection = RCC_CLK48SOURCE_PLL;
+  RCC_ExCLKInitStruct.Sdmmc1ClockSelection = RCC_SDMMC1CLKSOURCE_CLK48;
+  HAL_RCCEx_PeriphCLKConfig(&RCC_ExCLKInitStruct);
+*/
   return  sd_state;
 }
 
@@ -460,7 +468,7 @@ __weak void BSP_SD_MspInit(SD_HandleTypeDef *hsd, void *Params)
   
   /* Configure the DMA stream */
   HAL_DMA_Init(&dma_tx_handle); 
-  
+
   /* NVIC configuration for DMA transfer complete interrupt */
   HAL_NVIC_SetPriority(SD_DMAx_Rx_IRQn, 6, 0);
   HAL_NVIC_EnableIRQ(SD_DMAx_Rx_IRQn);
@@ -468,27 +476,9 @@ __weak void BSP_SD_MspInit(SD_HandleTypeDef *hsd, void *Params)
   /* NVIC configuration for DMA transfer complete interrupt */
   HAL_NVIC_SetPriority(SD_DMAx_Tx_IRQn, 6, 0);
   HAL_NVIC_EnableIRQ(SD_DMAx_Tx_IRQn);
+
 }
 
-/**
-  * @brief  Initializes the SD Detect pin MSP.
-  * @param  hsd: SD handle
-  * @param  Params
-  * @retval None
-  */
-__weak void BSP_SD_Detect_MspInit(SD_HandleTypeDef *hsd, void *Params)
-{
-  GPIO_InitTypeDef  gpio_init_structure;
-
-  SD_DETECT_GPIO_CLK_ENABLE();
-
-  /* GPIO configuration in input for uSD_Detect signal */
-  gpio_init_structure.Pin       = SD_DETECT_PIN;
-  gpio_init_structure.Mode      = GPIO_MODE_INPUT;
-  gpio_init_structure.Pull      = GPIO_PULLUP;
-  gpio_init_structure.Speed     = GPIO_SPEED_HIGH;
-  HAL_GPIO_Init(SD_DETECT_GPIO_PORT, &gpio_init_structure);
-}
 
 /**
   * @brief  DeInitializes the SD MSP.
@@ -524,6 +514,26 @@ __weak void BSP_SD_MspDeInit(SD_HandleTypeDef *hsd, void *Params)
 
   /* GPIO pins clock and DMA clocks can be shut down in the application
      by surcharging this __weak function */
+}
+
+/**
+  * @brief  Initializes the SD Detect pin MSP.
+  * @param  hsd: SD handle
+  * @param  Params
+  * @retval None
+  */
+__weak void BSP_SD_Detect_MspInit(SD_HandleTypeDef *hsd, void *Params)
+{
+  GPIO_InitTypeDef  gpio_init_structure;
+
+  SD_DETECT_GPIO_CLK_ENABLE();
+
+  /* GPIO configuration in input for uSD_Detect signal */
+  gpio_init_structure.Pin       = SD_DETECT_PIN;
+  gpio_init_structure.Mode      = GPIO_MODE_INPUT;
+  gpio_init_structure.Pull      = GPIO_PULLUP;
+  gpio_init_structure.Speed     = GPIO_SPEED_HIGH;
+  HAL_GPIO_Init(SD_DETECT_GPIO_PORT, &gpio_init_structure);
 }
 
 /**

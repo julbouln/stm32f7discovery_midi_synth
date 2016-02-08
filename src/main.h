@@ -61,8 +61,9 @@
 
 #include <arm_math.h>
 
-#define SAMPLE_RATE 48000
-//#define SAMPLE_RATE 44100
+//#define SAMPLE_RATE 48000
+//#define SAMPLE_RATE 96000
+#define SAMPLE_RATE 44100
 #define POLYPHONY 64
 
 //#define AUDIO_BUF_SIZE 4096
