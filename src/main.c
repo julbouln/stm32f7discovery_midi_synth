@@ -10,7 +10,7 @@ static void MPU_Config(void);
 static void CPU_CACHE_Enable(void);
 
 
-FATFS SDFatFs;  /* File system object for SD card logical drive */
+FATFS SDFatFs __attribute__((section(".SRAM")));  /* File system object for SD card logical drive */
 
 void SD_init() {
   char SDPath[4]; /* SD card logical drive path */
@@ -18,7 +18,12 @@ void SD_init() {
   {
     if (f_mount(&SDFatFs, (TCHAR const*)SDPath, 0) == FR_OK)
     {
+    } else {
+      Error_Handler();
     }
+  } else {
+      Error_Handler();
+    
   }
 }
 
@@ -99,6 +104,8 @@ int main(void)
 
   HAL_Delay(100);
 
+  setbuf(stdout, NULL);
+
   BSP_LED_On(LED1);
 
   SD_init();
@@ -130,8 +137,8 @@ int main(void)
 
   HAL_Delay(5);
 
-  BSP_AUDIO_OUT_Init(OUTPUT_DEVICE_AUTO, 50, SAMPLE_RATE);
-  BSP_AUDIO_OUT_SetAudioFrameSlot(CODEC_AUDIOFRAME_SLOT_02);  // PCM
+  BSP_AUDIO_OUT_Init(OUTPUT_DEVICE_AUTO, MASTER_VOLUME, SAMPLE_RATE);
+  BSP_AUDIO_OUT_SetAudioFrameSlot(CODEC_AUDIOFRAME_SLOT_02);  // PCM 2-channel
 
 #ifdef AUDIO_FORMAT_32BITS
   BSP_AUDIO_OUT_Play((uint32_t *)&buf[0], AUDIO_BUF_SIZE);
@@ -230,11 +237,17 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 25;
+#ifdef FREQ_216
+  RCC_OscInitStruct.PLL.PLLN = 432;
+#else
   RCC_OscInitStruct.PLL.PLLN = 400;
-//  RCC_OscInitStruct.PLL.PLLN = 432;
+#endif
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+#ifdef FREQ_216
+  RCC_OscInitStruct.PLL.PLLQ = 9;
+#else
   RCC_OscInitStruct.PLL.PLLQ = 8;
-//  RCC_OscInitStruct.PLL.PLLQ = 9;
+#endif
 
   ret = HAL_RCC_OscConfig(&RCC_OscInitStruct);
   if (ret != HAL_OK)
@@ -256,8 +269,12 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
   
+#ifdef FREQ_216
+  ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7);
+#else
   ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_6);
-//  ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7);
+#endif
+
   if (ret != HAL_OK)
   {
     while (1) { ; }

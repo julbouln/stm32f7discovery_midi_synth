@@ -2523,7 +2523,7 @@ FRESULT f_open (
 	FIL* fp,			/* Pointer to the blank file object */
 	const TCHAR* path,	/* Pointer to the file name */
 	BYTE mode			/* Access mode and file open mode flags */
-)
+) 
 {
 	FRESULT res;
 	DIR dj;

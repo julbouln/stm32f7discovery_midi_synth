@@ -85,8 +85,10 @@ void HardFault_Handler(void)
   {
   }
   */
+  
   exit(1);
 }
+
 
 /**
   * @brief  This function handles Memory Manage exception.

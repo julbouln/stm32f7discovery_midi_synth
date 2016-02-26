@@ -61,17 +61,30 @@
 
 #include <arm_math.h>
 
+#define MASTER_VOLUME 70
+
 //#define SAMPLE_RATE 48000
 //#define SAMPLE_RATE 96000
 #define SAMPLE_RATE 44100
+//#define SAMPLE_RATE 24000
 #define POLYPHONY 64
 
 //#define AUDIO_BUF_SIZE 4096
 #define AUDIO_BUF_SIZE 8192 
+//#define AUDIO_BUF_SIZE 16384
+//#define AUDIO_BUF_SIZE 32768
 
+//#define SOUNDFONT_FILE "4GMGSMT.SF2"
 //#define SOUNDFONT_FILE "TIM.SF2"
+//#define SOUNDFONT_FILE "8mbgmsfx.sf2"
+//#define SOUNDFONT_FILE "CHAOSV20.sf2"
+//#define SOUNDFONT_FILE "MERLINSI.SF2"
+//#define SOUNDFONT_FILE "MERLINCR.SF2"
+//#define SOUNDFONT_FILE "32gmst.sf2"
 #define SOUNDFONT_FILE "MERLIN.SF2"
+//#define SOUNDFONT_FILE "WEEDSGM3.SF2"
 //#define SOUNDFONT_FILE "FLUIDR3.SF2"
+//#define SOUNDFONT_FILE "COMPIFNT.SF2"
 
 #endif /* __MAIN_H */
 

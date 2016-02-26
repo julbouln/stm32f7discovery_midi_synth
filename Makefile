@@ -100,9 +100,14 @@ DEFS       = -D$(MCU_MC) -DUSE_HAL_DRIVER -DUSE_USB_FS -D__FPU_PRESENT -DUSE_STM
 
 DEFS      += -DSTM32 -DSTM32F7 -DSTM32F746xx -DSTM32F746NGHx -DSTM32F746G_DISCO
 # lfluidsynth
-DEFS      += -DFLUID_SAMPLE_FORMAT_FLOAT -DFLUID_SAMPLE_READ_DISK -DFLUID_SAMPLE_GC -DFLUID_ARM_OPT -DFLUID_SAMPLE_READ_CHUNK -DFLUID_NEW_GEN_API
-
-DEFS      += -DAUDIO_FORMAT_32BITS
+DEFS      += -DFLUID_CALC_FORMAT_FLOAT -DFLUID_SAMPLE_READ_DISK -DFLUID_SAMPLE_GC 
+DEFS      += -DFLUID_NEW_GEN_API 
+DEFS      += -DFLUID_NEW_VOICE_MOD_API
+DEFS      += -DFLUID_SAMPLE_READ_CHUNK
+DEFS      += -DFLUID_ARM_OPT 
+DEFS 	  += -DFLUID_BUFFER_S16
+#DEFS      += -DAUDIO_FORMAT_32BITS # 32bits audio
+DEFS      += -DFREQ_216 # 216mhz clocking
 
 DEFS      += -DARM_MATH_CM7
 
@@ -126,14 +131,16 @@ LIBS       = -L$(CMSIS_DIR)/Lib
 
 # Compiler flags
 #CFLAGS     = -Wall -g -std=c99 -Os
-CFLAGS     = -Wall -std=c99 -Os -g
+CFLAGS     = -Wall -std=c99 -Os
+
 #CFLAGS	   = -Wall -std=c99 -O3
 
 CFLAGS += -mcpu=cortex-m7 -mlittle-endian
 CFLAGS += -mfloat-abi=hard -mfpu=fpv5-sp-d16
 CFLAGS += -mthumb 
-CFLAGS += -ftree-vectorize -ffast-math -fsingle-precision-constant
-#CFLAGS += -mno-sched-prolog
+CFLAGS += -ftree-vectorize -ffast-math -fsingle-precision-constant 
+CFLAGS += -fno-schedule-insns -fno-schedule-insns2 # gcc do something wrong with inline assembly
+#CFLAGS += -fconserve-stack -mno-sched-prolog
 
 #CFLAGS    += -mlittle-endian -mcpu=cortex-m4 -mthumb -mthumb-interwork
 #CFLAGS    += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
@@ -190,7 +197,7 @@ obj/%.o : %.c | dirs
 $(TARGET).elf: $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) src/startup_$(MCU_LC).s $^ -o $@
 	$(OBJCOPY) $(TARGET).elf -O ihex $(TARGET).hex 
-	$(OBJDUMP) -sSt $(TARGET).elf >$(TARGET).lst
+	$(OBJDUMP) -M reg-names-std -sSt $(TARGET).elf >$(TARGET).lst
 	@echo "[SIZE]    $(TARGET).elf"
 	$(SIZE) $(TARGET).elf
 

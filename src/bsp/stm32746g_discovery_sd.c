@@ -144,7 +144,7 @@ uint8_t BSP_SD_Init(void)
   uSdHandle.Instance = SDMMC1;
 
   uSdHandle.Init.ClockEdge           = SDMMC_CLOCK_EDGE_RISING;
-  uSdHandle.Init.ClockBypass         = SDMMC_CLOCK_BYPASS_DISABLE;
+  uSdHandle.Init.ClockBypass         = SDMMC_CLOCK_BYPASS_ENABLE;
   uSdHandle.Init.ClockPowerSave      = SDMMC_CLOCK_POWER_SAVE_DISABLE;
   uSdHandle.Init.BusWide             = SDMMC_BUS_WIDE_1B;
   uSdHandle.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
@@ -179,7 +179,12 @@ uint8_t BSP_SD_Init(void)
       sd_state = MSD_OK;
     }
   }
+  
   /*
+    printf("CardType %d\n",uSdCardInfo.CardType);
+    printf("CardCapacity %d\n",uSdCardInfo.CardCapacity);
+    printf("CardBlockSize %d\n",uSdCardInfo.CardBlockSize);
+*/
   HAL_SD_HighSpeed(&uSdHandle);
 
   RCC_PeriphCLKInitTypeDef RCC_ExCLKInitStruct;
@@ -187,7 +192,7 @@ uint8_t BSP_SD_Init(void)
   RCC_ExCLKInitStruct.Clk48ClockSelection = RCC_CLK48SOURCE_PLL;
   RCC_ExCLKInitStruct.Sdmmc1ClockSelection = RCC_SDMMC1CLKSOURCE_CLK48;
   HAL_RCCEx_PeriphCLKConfig(&RCC_ExCLKInitStruct);
-*/
+
   return  sd_state;
 }
 

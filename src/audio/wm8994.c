@@ -431,6 +431,11 @@ uint32_t wm8994_Init(uint16_t DeviceAddr, uint16_t OutputInputDevice, uint8_t Vo
     /* Unmute the AIF1 Timeslot 0 DAC path */
     counter += CODEC_IO_Write(DeviceAddr, 0x420, 0x0000);
 
+    /* DSP */
+//    counter += CODEC_IO_Write(DeviceAddr, 0x421, 0xF00);
+//      counter += CODEC_IO_Write(DeviceAddr, 0x480, 0x6319);
+//      counter += CODEC_IO_Write(DeviceAddr, 0x440, 0x7f);
+
     /* Unmute DAC 2 (Left) */
     counter += CODEC_IO_Write(DeviceAddr, 0x612, 0x00C0);
 
@@ -439,6 +444,11 @@ uint32_t wm8994_Init(uint16_t DeviceAddr, uint16_t OutputInputDevice, uint8_t Vo
 
     /* Unmute the AIF1 Timeslot 1 DAC2 path */
     counter += CODEC_IO_Write(DeviceAddr, 0x422, 0x0000);
+
+    /* DSP */
+//    counter += CODEC_IO_Write(DeviceAddr, 0x423, 0xF00);
+//      counter += CODEC_IO_Write(DeviceAddr, 0x4A0, 0x6319);
+//      counter += CODEC_IO_Write(DeviceAddr, 0x450, 0x7f);
     
     /* Volume Control */
     wm8994_SetVolume(DeviceAddr, Volume);
