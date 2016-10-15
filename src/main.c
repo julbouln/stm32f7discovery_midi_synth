@@ -9,7 +9,7 @@ static void Error_Handler(void);
 static void MPU_Config(void);
 static void CPU_CACHE_Enable(void);
 
-
+#ifdef QSPI_SOUNDFONT_SD
 FATFS SDFatFs __attribute__((section(".SRAM")));  /* File system object for SD card logical drive */
 
 void SD_init() {
@@ -22,14 +22,16 @@ void SD_init() {
       Error_Handler();
     }
   } else {
-      Error_Handler();
-    
+    Error_Handler();
+
   }
 }
+#endif
+
 
 extern fluid_synth_t* synth;
 
-//__attribute__((section(".SRAM"))) 
+//__attribute__((section(".SRAM")))
 // __attribute__((section(".DTCM")))
 #ifdef AUDIO_FORMAT_32BITS
 //uint32_t  buf[AUDIO_BUF_SIZE] __attribute__((section(".DTCM")));
@@ -68,6 +70,35 @@ void BSP_AUDIO_OUT_TransferComplete_CallBack(void)
 
 }
 
+void QSPI_init() {
+
+  static QSPI_Info pQSPI_Info;
+  uint8_t status;
+  status = BSP_QSPI_Init();
+
+  /*##-2- Read & check the QSPI info #######################################*/
+  /* Initialize the structure */
+  pQSPI_Info.FlashSize        = (uint32_t)0x00;
+  pQSPI_Info.EraseSectorSize    = (uint32_t)0x00;
+  pQSPI_Info.EraseSectorsNumber = (uint32_t)0x00;
+  pQSPI_Info.ProgPageSize       = (uint32_t)0x00;
+  pQSPI_Info.ProgPagesNumber    = (uint32_t)0x00;
+
+  /* Read the QSPI memory info */
+  BSP_QSPI_GetInfo(&pQSPI_Info);
+
+  /* Test the correctness */
+  if ((pQSPI_Info.FlashSize != 0x1000000) || (pQSPI_Info.EraseSectorSize != 0x1000)  ||
+      (pQSPI_Info.ProgPageSize != 0x100)  || (pQSPI_Info.EraseSectorsNumber != 4096) ||
+      (pQSPI_Info.ProgPagesNumber != 65536))
+  {
+    BSP_LED_Off(LED1);
+  }
+
+#ifdef QSPI_MEMORY_MAPPED
+  BSP_QSPI_MemoryMappedMode();
+#endif
+}
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -104,11 +135,18 @@ int main(void)
 
   HAL_Delay(100);
 
+
   setbuf(stdout, NULL);
 
-  BSP_LED_On(LED1);
+  BSP_LED_Off(LED1);
 
+#ifdef QSPI_SOUNDFONT_SD
   SD_init();
+#endif
+
+// QSPI
+  QSPI_init();
+
   HAL_Delay(100);
 
   fluid_settings_t* settings;
@@ -116,7 +154,7 @@ int main(void)
 
   /* Create the settings. */
   settings = new_fluid_settings();
-  fluid_settings_setnum(settings, "synth.sample-rate", SAMPLE_RATE); 
+  fluid_settings_setnum(settings, "synth.sample-rate", SAMPLE_RATE);
 
   fluid_settings_setstr(settings, "synth.reverb.active", "no");
   fluid_settings_setstr(settings, "synth.chorus.active", "no");
@@ -125,9 +163,11 @@ int main(void)
   /* Create the synthesizer. */
   synth = new_fluid_synth(settings);
 
+
   sfont_id = fluid_synth_sfload(synth, SOUNDFONT_FILE, 1);
   fluid_synth_set_interp_method(synth, -1, FLUID_INTERP_NONE);
 //  fluid_synth_set_interp_method(synth, -1, FLUID_INTERP_LINEAR);
+  BSP_LED_On(LED1);
 
   /* Make the connection and initialize to USB_OTG/usbdc_core */
   USBD_Init(&USBD_Device, &AUDIO_Desc, 0);
@@ -146,12 +186,12 @@ int main(void)
   BSP_AUDIO_OUT_Play((uint16_t *)&buf[0], AUDIO_BUF_SIZE);
 #endif
 
-  BSP_LED_Off(LED1);
+//  BSP_LED_Off(LED1);
 
   while (1)
   {
-                BSP_LED_Toggle(LED1);
-                HAL_Delay(1000);
+    BSP_LED_Toggle(LED1);
+    HAL_Delay(1000);
   }
 
 }
@@ -223,7 +263,7 @@ void BSP_AUDIO_OUT_ClockConfig(SAI_HandleTypeDef *hsai, uint32_t AudioFreq, void
   * @retval None
   */
 
-// 200 mhz - don't know why but 216 mhz hang  
+// 200 mhz - don't know why but 216 mhz hang
 void SystemClock_Config(void)
 {
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
@@ -268,11 +308,11 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
-  
+
 #ifdef FREQ_216
   ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7);
 #else
-  ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_6);
+  ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
 #endif
 
   if (ret != HAL_OK)
@@ -296,9 +336,14 @@ static void MPU_Config(void)
   HAL_MPU_Disable();
 
   /* Configure the MPU attributes as WT for SDRAM */
-  MPU_InitStruct.Enable = MPU_REGION_ENABLE;
-  MPU_InitStruct.BaseAddress = 0xC0000000;
-  MPU_InitStruct.Size = MPU_REGION_SIZE_8MB;
+    MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+  #ifdef USE_SDRAM
+    MPU_InitStruct.BaseAddress = 0xC0000000;
+    MPU_InitStruct.Size = MPU_REGION_SIZE_8MB;
+  #else
+    MPU_InitStruct.BaseAddress = 0x20010000;
+    MPU_InitStruct.Size = MPU_REGION_SIZE_256KB;
+  #endif
   MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
   MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
   MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
@@ -321,8 +366,8 @@ static void MPU_Config(void)
   */
 static void CPU_CACHE_Enable(void)
 {
-    /* Enable branch prediction */
-  SCB->CCR |= (1 <<18); 
+  /* Enable branch prediction */
+  SCB->CCR |= (1 << 18);
   __DSB();
 
   /* Enable I-Cache */

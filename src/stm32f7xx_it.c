@@ -182,7 +182,6 @@ void OTG_HS_IRQHandler(void)
   HAL_PCD_IRQHandler(&hpcd);
 }
 
-
 /**
   * @brief  This function handles DMA2 Stream 3 interrupt request.
   * @param  None
@@ -223,6 +222,17 @@ void DMA2_Stream4_IRQHandler(void)
   HAL_DMA_IRQHandler(haudio_out_sai.hdmatx);
 }
 
+extern QSPI_HandleTypeDef QSPIHandle;
+
+void QUADSPI_IRQHandler(void)
+{
+  HAL_QSPI_IRQHandler(&QSPIHandle);
+}
+
+void QSPI_DMA_IRQ_HANDLER(void)
+{
+  HAL_DMA_IRQHandler(QSPIHandle.hdma);
+}
 
 /******************************************************************************/
 /*                 STM32F7xx Peripherals Interrupt Handlers                   */

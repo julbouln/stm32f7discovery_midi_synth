@@ -46,16 +46,18 @@ SRCS      += stm32f7xx_it.c
 # Basic HAL libraries
 SRCS      += stm32f7xx_hal_rcc.c stm32f7xx_hal_rcc_ex.c stm32f7xx_hal.c stm32f7xx_hal_cortex.c stm32f7xx_hal_gpio.c \
 			 stm32f7xx_hal_pwr_ex.c stm32f7xx_ll_fmc.c stm32f7xx_hal_sdram.c stm32f7xx_hal_pcd.c stm32f7xx_hal_pcd_ex.c \
-			 stm32f7xx_hal_hcd.c stm32f7xx_hal_i2s.c stm32f7xx_hal_sai.c stm32f7xx_hal_sai_ex.c stm32f7xx_hal_i2c.c \
+			 stm32f7xx_hal_hcd.c stm32f7xx_hal_i2s.c stm32f7xx_hal_qspi.c stm32f7xx_hal_sai.c stm32f7xx_hal_sai_ex.c stm32f7xx_hal_i2c.c \
 			 stm32f7xx_ll_usb.c stm32f7xx_hal_sd.c stm32f7xx_ll_sdmmc.c stm32f7xx_hal_dma.c \
-			 $(BSP_BASE).c stm32746g_discovery_audio.c wm8994.c stm32746g_discovery_sd.c \
+			 $(BSP_BASE).c stm32746g_discovery_audio.c wm8994.c stm32746g_discovery_sd.c stm32746g_discovery_qspi.c \
 			 ff.c diskio.c ff_gen_drv.c sd_diskio.c ff_wrapper.c \
+			 qspi_wrapper.c \
 			 usbd_core.c usbd_ctlreq.c usbd_ioreq.c \
 			 usbd_midi.c usbd_midi_if.c \
 			 usbd_conf.c usbd_desc.c \
 			 fluid_chan.c fluid_defsfont.c fluid_gen.c fluid_list.c fluid_mod.c fluid_synth.c fluid_voice.c \
 			 fluid_chorus.c fluid_hash.c fluid_midi.c fluid_rev.c fluid_sys.c \
 			 fluid_conv.c fluid_event.c fluid_io.c fluid_midi_router.c fluid_settings.c fluid_tuning.c \
+			 fluid_altsfont.c riff.c \
 			 arm_common_tables.c arm_sin_cos_f32.c arm_sin_f32.c arm_cos_f32.c arm_mult_f32.c arm_add_f32.c
 
 
@@ -100,14 +102,21 @@ DEFS       = -D$(MCU_MC) -DUSE_HAL_DRIVER -DUSE_USB_FS -D__FPU_PRESENT -DUSE_STM
 
 DEFS      += -DSTM32 -DSTM32F7 -DSTM32F746xx -DSTM32F746NGHx -DSTM32F746G_DISCO
 # lfluidsynth
-DEFS      += -DFLUID_CALC_FORMAT_FLOAT -DFLUID_SAMPLE_READ_DISK -DFLUID_SAMPLE_GC 
+DEFS      += -DQSPI_SOUNDFONT_ROM
+#DEFS      += -DQSPI_SOUNDFONT_SD
+DEFS  	  += -DQSPI_MEMORY_MAPPED
+DEFS      += -DUSE_SDRAM
+DEFS      += -DFLUID_CALC_FORMAT_FLOAT 
+DEFS 	  += -DFLUID_ALTSFONT -DFLUID_NO_NAMES
+DEFS      += -DFLUID_SAMPLE_STREAM
+#DEFS      += -DFLUID_SAMPLE_READ_DISK -DFLUID_SAMPLE_GC 
+#DEFS      += -DFLUID_SAMPLE_READ_CHUNK
 DEFS      += -DFLUID_NEW_GEN_API 
 DEFS      += -DFLUID_NEW_VOICE_MOD_API
-DEFS      += -DFLUID_SAMPLE_READ_CHUNK
 DEFS      += -DFLUID_ARM_OPT 
 DEFS 	  += -DFLUID_BUFFER_S16
 #DEFS      += -DAUDIO_FORMAT_32BITS # 32bits audio
-DEFS      += -DFREQ_216 # 216mhz clocking
+#DEFS      += -DFREQ_216 # 216mhz clocking
 
 DEFS      += -DARM_MATH_CM7
 
@@ -130,8 +139,8 @@ INCS      += -I$(LFLUIDSYNTH_DIR)
 LIBS       = -L$(CMSIS_DIR)/Lib
 
 # Compiler flags
-#CFLAGS     = -Wall -g -std=c99 -Os
-CFLAGS     = -Wall -std=c99 -Os
+CFLAGS     = -Wall -g -std=c99 -Os
+#CFLAGS     = -Wall -std=c99 -Os
 
 #CFLAGS	   = -Wall -std=c99 -O3
 

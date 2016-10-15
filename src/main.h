@@ -55,9 +55,12 @@
 #include "stm32746g_discovery.h"
 #include "stm32746g_discovery_audio.h"
 #include "stm32746g_discovery_sd.h"
+#include "stm32746g_discovery_qspi.h"
 
 #include "ff_gen_drv.h"
 #include "sd_diskio.h"
+
+#include "qspi_wrapper.h"
 
 #include <arm_math.h>
 
@@ -67,7 +70,7 @@
 //#define SAMPLE_RATE 96000
 #define SAMPLE_RATE 44100
 //#define SAMPLE_RATE 24000
-#define POLYPHONY 64
+#define POLYPHONY 32
 
 //#define AUDIO_BUF_SIZE 4096
 #define AUDIO_BUF_SIZE 8192 
@@ -78,13 +81,15 @@
 //#define SOUNDFONT_FILE "TIM.SF2"
 //#define SOUNDFONT_FILE "8mbgmsfx.sf2"
 //#define SOUNDFONT_FILE "CHAOSV20.sf2"
+#define SOUNDFONT_FILE "CT4MGM.SF2"
 //#define SOUNDFONT_FILE "MERLINSI.SF2"
 //#define SOUNDFONT_FILE "MERLINCR.SF2"
 //#define SOUNDFONT_FILE "32gmst.sf2"
-#define SOUNDFONT_FILE "MERLIN.SF2"
+//#define SOUNDFONT_FILE "MERLIN.SF2"
 //#define SOUNDFONT_FILE "WEEDSGM3.SF2"
 //#define SOUNDFONT_FILE "FLUIDR3.SF2"
 //#define SOUNDFONT_FILE "COMPIFNT.SF2"
+
 
 #endif /* __MAIN_H */
 

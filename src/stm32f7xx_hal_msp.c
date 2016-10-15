@@ -149,6 +149,8 @@ void HAL_SDRAM_MspDeInit(SDRAM_HandleTypeDef *hsdram)
                          GPIO_PIN_5 | GPIO_PIN_10);
 }
 
+
+
 /**
   * @}
   */

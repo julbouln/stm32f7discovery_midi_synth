@@ -95,8 +95,10 @@
 /*!< Uncomment the following line if you need to use external SRAM or SDRAM mounted
      on EVAL board as data memory  */
 /* #define DATA_IN_ExtSRAM */ 
+#ifdef USE_SDRAM
 #define DATA_IN_ExtSDRAM
-
+#endif
+    
 #if defined(DATA_IN_ExtSRAM) && defined(DATA_IN_ExtSDRAM)
  #error "Please select DATA_IN_ExtSRAM or DATA_IN_ExtSDRAM " 
 #endif /* DATA_IN_ExtSRAM && DATA_IN_ExtSDRAM */

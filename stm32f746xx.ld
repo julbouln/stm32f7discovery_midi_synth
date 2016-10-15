@@ -53,7 +53,8 @@
 ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack */
-_estack = 0xC07FFFFF;    /* end of 8MB SDRAM */
+_estack = 0xC07FFFFF;     /* end of 8MB SDRAM */
+/* _estack = 0x2004FFFF;  */
 
 /* Generate a link error if heap and stack don't fit into RAM */
 _Min_Heap_Size = 0x200;      /* required amount of heap  */
@@ -136,6 +137,7 @@ SECTIONS
 
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);
+
 
   /* Initialized data sections goes into RAM, load LMA copy after code */
   .data : 

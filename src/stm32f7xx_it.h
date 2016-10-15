@@ -68,6 +68,7 @@ void DMA2_Stream4_IRQHandler(void);
 void DMA2_Stream3_IRQHandler(void);
 void DMA2_Stream6_IRQHandler(void);
 void SDMMC1_IRQHandler(void);
+void QSPI_DMA_IRQ_HANDLER(void);
 
 #ifdef __cplusplus
 }
