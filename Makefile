@@ -45,7 +45,7 @@ SRCS      += stm32f7xx_it.c
 
 # Basic HAL libraries
 SRCS      += stm32f7xx_hal_rcc.c stm32f7xx_hal_rcc_ex.c stm32f7xx_hal.c stm32f7xx_hal_cortex.c stm32f7xx_hal_gpio.c \
-			 stm32f7xx_hal_pwr_ex.c stm32f7xx_ll_fmc.c stm32f7xx_hal_sdram.c stm32f7xx_hal_pcd.c stm32f7xx_hal_pcd_ex.c \
+			 stm32f7xx_hal_pwr_ex.c stm32f7xx_hal_pcd.c stm32f7xx_hal_pcd_ex.c \
 			 stm32f7xx_hal_hcd.c stm32f7xx_hal_i2s.c stm32f7xx_hal_qspi.c stm32f7xx_hal_sai.c stm32f7xx_hal_sai_ex.c stm32f7xx_hal_i2c.c \
 			 stm32f7xx_ll_usb.c stm32f7xx_hal_sd.c stm32f7xx_ll_sdmmc.c stm32f7xx_hal_dma.c \
 			 $(BSP_BASE).c stm32746g_discovery_audio.c wm8994.c stm32746g_discovery_sd.c stm32746g_discovery_qspi.c \
@@ -97,18 +97,22 @@ OCD        = openocd-stm32f7/src/openocd
 ###############################################################################
 # Options
 
+USE_SDRAM = no
+
 # Defines
 DEFS       = -D$(MCU_MC) -DUSE_HAL_DRIVER -DUSE_USB_FS -D__FPU_PRESENT -DUSE_STM32746G_DISCOVERY
 
 DEFS      += -DSTM32 -DSTM32F7 -DSTM32F746xx -DSTM32F746NGHx -DSTM32F746G_DISCO
 # lfluidsynth
 DEFS      += -DQSPI_SOUNDFONT_ROM
-#DEFS      += -DQSPI_SOUNDFONT_SD
+#DEFS      += -DSD_SOUNDFONT_ROM
 DEFS  	  += -DQSPI_MEMORY_MAPPED
-DEFS      += -DUSE_SDRAM
+ifeq ($(USE_SDRAM),yes)
+	DEFS      += -DUSE_SDRAM
+endif
 DEFS      += -DFLUID_CALC_FORMAT_FLOAT 
 DEFS 	  += -DFLUID_ALTSFONT -DFLUID_NO_NAMES
-DEFS      += -DFLUID_SAMPLE_STREAM
+DEFS      += -DFLUID_SAMPLE_MMAP
 #DEFS      += -DFLUID_SAMPLE_READ_DISK -DFLUID_SAMPLE_GC 
 #DEFS      += -DFLUID_SAMPLE_READ_CHUNK
 DEFS      += -DFLUID_NEW_GEN_API 
@@ -157,7 +161,11 @@ CFLAGS    += -ffunction-sections -fdata-sections
 CFLAGS    += $(INCS) $(DEFS)
 
 # Linker flags
-LDFLAGS    = -Wl,--gc-sections -Wl,-Map=$(TARGET).map $(LIBS) -T$(MCU_LC).ld
+ifeq ($(USE_SDRAM),yes)
+	LDFLAGS    = -Wl,--gc-sections -Wl,-Map=$(TARGET).map $(LIBS) -T$(MCU_LC)_sdram.ld
+else
+	LDFLAGS    = -Wl,--gc-sections -Wl,-Map=$(TARGET).map $(LIBS) -T$(MCU_LC).ld
+endif
 
 # Enable Semihosting
 LDFLAGS   += --specs=rdimon.specs -lc -lrdimon 
@@ -204,7 +212,11 @@ obj/%.o : %.c | dirs
 	$(CC) $(CFLAGS) -c -o $@ $< -MMD -MF dep/$(*F).d
 
 $(TARGET).elf: $(OBJS)
+ifeq ($(USE_SDRAM),yes)
+	$(CC) $(CFLAGS) $(LDFLAGS) src/startup_$(MCU_LC)_sdram.s $^ -o $@
+else
 	$(CC) $(CFLAGS) $(LDFLAGS) src/startup_$(MCU_LC).s $^ -o $@
+endif
 	$(OBJCOPY) $(TARGET).elf -O ihex $(TARGET).hex 
 	$(OBJDUMP) -M reg-names-std -sSt $(TARGET).elf >$(TARGET).lst
 	@echo "[SIZE]    $(TARGET).elf"

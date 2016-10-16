@@ -9,7 +9,7 @@ static void Error_Handler(void);
 static void MPU_Config(void);
 static void CPU_CACHE_Enable(void);
 
-#ifdef QSPI_SOUNDFONT_SD
+#ifdef SD_SOUNDFONT_ROM
 FATFS SDFatFs __attribute__((section(".SRAM")));  /* File system object for SD card logical drive */
 
 void SD_init() {
@@ -29,7 +29,7 @@ void SD_init() {
 #endif
 
 
-extern fluid_synth_t* synth;
+fluid_synth_t* synth;
 
 //__attribute__((section(".SRAM")))
 // __attribute__((section(".DTCM")))
@@ -39,7 +39,9 @@ extern fluid_synth_t* synth;
 //uint16_t  buf[AUDIO_BUF_SIZE] __attribute__((section(".DTCM")));
 #endif
 
-uint8_t  buf[AUDIO_BUF_SIZE] __attribute__((section(".DTCM")));
+//uint8_t  buf[AUDIO_BUF_SIZE] __attribute__((section(".DTCM")));
+
+uint8_t  buf[AUDIO_BUF_SIZE];
 
 //static int16_t *buf;
 
@@ -135,12 +137,11 @@ int main(void)
 
   HAL_Delay(100);
 
-
   setbuf(stdout, NULL);
 
   BSP_LED_Off(LED1);
 
-#ifdef QSPI_SOUNDFONT_SD
+#ifdef SD_SOUNDFONT_ROM
   SD_init();
 #endif
 
@@ -156,13 +157,12 @@ int main(void)
   settings = new_fluid_settings();
   fluid_settings_setnum(settings, "synth.sample-rate", SAMPLE_RATE);
 
-  fluid_settings_setstr(settings, "synth.reverb.active", "no");
-  fluid_settings_setstr(settings, "synth.chorus.active", "no");
+//  fluid_settings_setstr(settings, "synth.reverb.active", "no");
+//  fluid_settings_setstr(settings, "synth.chorus.active", "no");
   fluid_settings_setint(settings, "synth.polyphony", POLYPHONY);
 
   /* Create the synthesizer. */
   synth = new_fluid_synth(settings);
-
 
   sfont_id = fluid_synth_sfload(synth, SOUNDFONT_FILE, 1);
   fluid_synth_set_interp_method(synth, -1, FLUID_INTERP_NONE);
@@ -312,7 +312,7 @@ void SystemClock_Config(void)
 #ifdef FREQ_216
   ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7);
 #else
-  ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
+  ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_6);
 #endif
 
   if (ret != HAL_OK)

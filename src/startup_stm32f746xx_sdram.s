@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
   * @file      startup_stm32f746xx.s
-  * @author    MCD Application Team
-  * Version    V1.0.2
-  * Date       18-November-2015
+  * @author    MCD Application Team , Benny Zinke
+  * @Version   V1.0.2
+  * @Date      06-October-2015
   * @brief     STM32F746xx Devices vector table for GCC based toolchain. 
   *            This module performs:
   *                - Set the initial SP
@@ -13,6 +13,14 @@
   *                  calls main()).
   *            After Reset the Cortex-M7 processor is in Thread mode,
   *            priority is Privileged, and the Stack is set to Main.
+  ******************************************************************************
+  * Changes:
+  * line 76: .equ __initial_spTop, 0x2004FFFF <-> define the address of the init sp
+  * line 91: ldr   sp, =__initial_spTop 	  <-> set stack pointer
+  * line 95: movs  r1, #0  					  <-> set register r0 to zero
+  * line 96: bl  SystemInit					  <-> Init System and SDRAM
+  * line 128: uncomment the next 2 lines to place the stack in SDRAM (default: SRAM)
+  * the old line with "bl SystemInit" was removed
   ******************************************************************************
   * @attention
   *
@@ -64,6 +72,10 @@ defined in linker script */
 .word  _ebss
 /* stack used for SystemInit_ExtMemCtl; always internal RAM used */
 
+/* stack used for SystemInit & SystemInit_ExtMemCtl*/
+.equ __initial_spTop, 0x2004FFFF
+/*.equ __initial_spTop, 0xC07FFFFF */
+
 /**
  * @brief  This is the code that gets called when the processor first
  *          starts execution following a reset event. Only the absolutely
@@ -73,13 +85,16 @@ defined in linker script */
  * @retval : None
 */
 
-    .section  .text.Reset_Handler
-  .weak  Reset_Handler
-  .type  Reset_Handler, %function
+	.section  .text.Reset_Handler
+	.weak  Reset_Handler
+	.type  Reset_Handler, %function
 Reset_Handler:  
-  ldr   sp, =_estack      /* set stack pointer */
+	ldr   sp, =__initial_spTop     /* set stack pointer */
 
+// Assembler instruction with s at the end -> update flags
 /* Copy the data segment initializers from flash to SRAM */  
+  movs  r1, #0
+  bl  SystemInit				// Init System and SDRAM
   movs  r1, #0
   b  LoopCopyDataInit
 
@@ -107,10 +122,16 @@ LoopFillZerobss:
   cmp  r2, r3
   bcc  FillZerobss
 
-/* Call the clock system initialization function.*/
-  bl  SystemInit   
 /* Call static constructors */
     bl __libc_init_array
+
+/* Restore original stack pointer. */
+/* Remove comments to swap stack from SRAM to SDRAM */
+#ifdef USE_SDRAM
+	ldr     r0, =_estack
+	msr     MSP, r0
+#endif
+
 /* Call the application's entry point.*/
   bl  main
   bx  lr    
@@ -141,7 +162,7 @@ Infinite_Loop:
    
    
 g_pfnVectors:
-  .word  _estack
+  .word  __initial_spTop /* Use internal RAM for stack for calling SystemInit. */
   .word  Reset_Handler
 
   .word  NMI_Handler

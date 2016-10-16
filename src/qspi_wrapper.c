@@ -46,11 +46,11 @@ void QSPI_fclose(QSPI_FILE *f) {
 
 __IO uint8_t *qspi_addr = (__IO uint8_t *)(0x90000000);
 
-inline uint8_t *QSPI_mmap(size_t pos) {
+uint8_t *QSPI_mmap(size_t pos, size_t size, QSPI_FILE * f) {
   return (uint8_t *)(qspi_addr + pos);
 }
 
-inline size_t QSPI_fread(void * ptr, size_t size, size_t count, QSPI_FILE * f ) {
+size_t QSPI_fread(void * ptr, size_t size, size_t count, QSPI_FILE * f ) {
   size_t max_size=count*size;
   uint8_t *buf = (uint8_t *)ptr;
 
@@ -66,7 +66,7 @@ inline size_t QSPI_fread(void * ptr, size_t size, size_t count, QSPI_FILE * f ) 
 
 #else
 
-inline size_t QSPI_fread(void * ptr, size_t size, size_t count, QSPI_FILE * f ) {
+size_t QSPI_fread(void * ptr, size_t size, size_t count, QSPI_FILE * f ) {
   size_t max_size=count*size;
   uint8_t *buf = (uint8_t *)ptr;
 

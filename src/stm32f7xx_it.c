@@ -73,6 +73,7 @@ void NMI_Handler(void)
 {
 }
 
+
 /**
   * @brief  This function handles Hard Fault exception.
   * @param  None
@@ -85,7 +86,34 @@ void HardFault_Handler(void)
   {
   }
   */
-  
+/*
+unsigned int stacked_r0;
+unsigned int stacked_r1;
+unsigned int stacked_r2;
+unsigned int stacked_r3;
+unsigned int stacked_r12;
+unsigned int stacked_lr;
+unsigned int stacked_pc;
+unsigned int stacked_psr;
+uint32_t* hardfault_args = (uint32_t*) 0x20000400;
+
+__asm( "TST LR, #4 \n"
+"ITE EQ \n"
+"MRSEQ R0, MSP \n"
+"MRSNE R0, PSP \n");
+
+stacked_r0 = ((unsigned long) hardfault_args[0]);
+stacked_r1 = ((unsigned long) hardfault_args[1]);
+stacked_r2 = ((unsigned long) hardfault_args[2]);
+stacked_r3 = ((unsigned long) hardfault_args[3]);
+
+stacked_r12 = ((unsigned long) hardfault_args[4]);
+stacked_lr = ((unsigned long) hardfault_args[5]);
+stacked_pc = ((unsigned long) hardfault_args[6]);
+stacked_psr = ((unsigned long) hardfault_args[7]); 
+  while(1);
+*/
+
   exit(1);
 }
 

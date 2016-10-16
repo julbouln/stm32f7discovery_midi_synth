@@ -1,7 +1,7 @@
 #include "usbd_midi_if.h"
 #include "lfluidsynth.h"
 
-fluid_synth_t* synth;
+extern fluid_synth_t* synth;
 
 static int8_t Midi_Receive(uint8_t *msg, uint32_t len);
 

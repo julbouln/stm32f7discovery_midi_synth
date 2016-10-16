@@ -15,5 +15,5 @@ size_t QSPI_ftell(QSPI_FILE * f);
 size_t QSPI_fread(void * ptr, size_t size, size_t count, QSPI_FILE * f );
 void QSPI_fclose(QSPI_FILE *);
 
-uint8_t *QSPI_mmap(size_t pos);
+uint8_t *QSPI_mmap(size_t pos, size_t size, QSPI_FILE *f);
 #endif
