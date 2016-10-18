@@ -70,7 +70,7 @@
 //#define SAMPLE_RATE 96000
 #define SAMPLE_RATE 44100
 //#define SAMPLE_RATE 24000
-#define POLYPHONY 32
+#define POLYPHONY 64
 
 //#define AUDIO_BUF_SIZE 4096
 #define AUDIO_BUF_SIZE 8192 

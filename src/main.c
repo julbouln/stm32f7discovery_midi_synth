@@ -74,6 +74,8 @@ void BSP_AUDIO_OUT_TransferComplete_CallBack(void)
 
 void QSPI_init() {
 
+  BSP_QSPI_DeInit();
+
   static QSPI_Info pQSPI_Info;
   uint8_t status;
   status = BSP_QSPI_Init();
@@ -157,8 +159,8 @@ int main(void)
   settings = new_fluid_settings();
   fluid_settings_setnum(settings, "synth.sample-rate", SAMPLE_RATE);
 
-//  fluid_settings_setstr(settings, "synth.reverb.active", "no");
-//  fluid_settings_setstr(settings, "synth.chorus.active", "no");
+  fluid_settings_setstr(settings, "synth.reverb.active", "no");
+  fluid_settings_setstr(settings, "synth.chorus.active", "no");
   fluid_settings_setint(settings, "synth.polyphony", POLYPHONY);
 
   /* Create the synthesizer. */
