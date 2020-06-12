@@ -1,3 +1,5 @@
+DEPRECATED see github.com/julbouln/musicboard for updated version
+
 STM32F746g Discovery board SF2 polyphonic MIDI synthesizer
 
 This project use audio, SDRAM, SD card and USB of the board to provide an USB MIDI synthesizer.
